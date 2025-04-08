@@ -1,0 +1,71 @@
+import mysql.connector
+
+# Initialize database connection
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",  # Change if needed
+    password="",  # Change if needed
+    database="sqli_scanner"  # Ensure this database exists in XAMPP
+)
+cursor = conn.cursor()
+
+# Create table to store detected vulnerabilities
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS vulnerabilities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    payload TEXT,
+    risk_level TEXT
+)
+''')
+conn.commit()
+
+# Classification rules
+def classify_severity(payload):
+    high_risk_payloads = ["' OR '1'='1", "UNION SELECT", "DROP TABLE"]
+    medium_risk_payloads = ["' OR 'a'='a", "LIKE '%admin%"]
+    low_risk_payloads = ["' --", "' #"]
+    
+    if any(p in payload for p in high_risk_payloads):
+        return "High Risk"
+    elif any(p in payload for p in medium_risk_payloads):
+        return "Medium Risk"
+    elif any(p in payload for p in low_risk_payloads):
+        return "Low Risk"
+    else:
+        return "Secure"
+
+# Scanner function
+def scan_website(dummy_website, payloads):
+    print(f"Scanning website: {dummy_website}\n")
+    for payload in payloads:
+        risk_level = classify_severity(payload)
+        cursor.execute("INSERT INTO vulnerabilities (payload, risk_level) VALUES (%s, %s)", (payload, risk_level))
+        conn.commit()
+        print(f"Payload: {payload} | Risk Level: {risk_level}")
+
+# Fetch results for display
+def display_results():
+    cursor.execute("SELECT * FROM vulnerabilities")
+    results = cursor.fetchall()
+    print("\nStored Vulnerabilities:")
+    for row in results:
+        print(f"ID: {row[0]}, Payload: {row[1]}, Risk Level: {row[2]}")
+
+# Dummy website and predefined SQL injection payloads
+dummy_website = "http://vulnerable-website.com"
+sql_payloads = [
+    "' OR '1'='1",   # Classic SQLi - High Risk
+    "UNION SELECT username, password FROM users",  # High Risk
+    "LIKE '%admin%'",  # Medium Risk
+    "' --",  # Low Risk
+    "' #",   # Low Risk
+    "normal_input"  # Secure
+]
+
+# Execute scan and display results
+scan_website(dummy_website, sql_payloads)
+display_results()
+
+# Close connection
+conn.close()
+

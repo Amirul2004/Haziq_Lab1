@@ -1,0 +1,43 @@
+import requests
+import json
+
+def classify_severity(risk_score):
+    """
+    Classifies SQL Injection risk into Low, Medium, or High based on risk score.
+    """
+    if risk_score < 3:
+        return "🟡 LOW RISK", 1
+    elif 3 <= risk_score < 7:
+        return "🟠 MEDIUM RISK", 2
+    else:
+        return "🔴 HIGH RISK", 3
+
+def send_to_database(url, risk_label, risk_level):
+    """
+    Sends classified risk data to the PHP script for database insertion.
+    """
+    data = {
+        "risk_label": risk_label,
+        "risk_level": risk_level
+    }
+    
+    try:
+        response = requests.post(url, data=json.dumps(data), headers={"Content-Type": "application/json"})
+        if response.status_code == 200:
+            print("✅ Data successfully sent to the database!")
+        else:
+            print(f"❌ Failed to send data. Server response: {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Request failed: {e}")
+
+# Example: Scanner detects SQL Injection and assigns a risk score
+detected_risk_score = 5  # Example risk score from scanner
+
+# Classify the severity
+risk_label, risk_level = classify_severity(detected_risk_score)
+
+# Define the PHP script URL
+php_url = "http://localhost/save_data.php"  # Ensure this matches your actual PHP file path
+
+# Send data to the database
+send_to_database(php_url, risk_label, risk_level)

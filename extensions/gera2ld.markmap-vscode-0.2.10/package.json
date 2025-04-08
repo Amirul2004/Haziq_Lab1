@@ -1,0 +1,173 @@
+{
+	"name": "markmap-vscode",
+	"version": "0.2.10",
+	"description": "Visualize your markdown in VSCode",
+	"author": "Gerald <gera2ld@live.com>",
+	"license": "MIT",
+	"displayName": "Markmap",
+	"publisher": "gera2ld",
+	"icon": "assets/favicon.png",
+	"engines": {
+		"vscode": "^1.75.0"
+	},
+	"categories": [
+		"Visualization"
+	],
+	"keywords": [
+		"markmap",
+		"mindmap",
+		"markdown"
+	],
+	"activationEvents": [],
+	"contributes": {
+		"commands": [
+			{
+				"command": "markmap-vscode.open",
+				"category": "Markmap",
+				"title": "Open as markmap",
+				"icon": {
+					"light": "./assets/light.svg",
+					"dark": "./assets/dark.svg"
+				}
+			},
+			{
+				"command": "markmap-vscode.toggle",
+				"category": "Markmap",
+				"title": "Toggle the active node"
+			},
+			{
+				"command": "markmap-vscode.toggle-recursively",
+				"category": "Markmap",
+				"title": "Toggle the active node recursively"
+			}
+		],
+		"customEditors": [
+			{
+				"viewType": "markmap-vscode.markmap",
+				"displayName": "Markmap",
+				"selector": [
+					{
+						"filenamePattern": "*.md"
+					}
+				],
+				"priority": "option"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"when": "editorLangId == markdown || editorLangId == mdx",
+					"command": "markmap-vscode.open"
+				},
+				{
+					"when": "editorLangId == markdown || editorLangId == mdx",
+					"command": "markmap-vscode.toggle"
+				},
+				{
+					"when": "editorLangId == markdown || editorLangId == mdx",
+					"command": "markmap-vscode.toggle-recursively"
+				}
+			],
+			"explorer/context": [
+				{
+					"when": "resourceLangId == markdown || resourceLangId == mdx",
+					"command": "markmap-vscode.open",
+					"group": "navigation"
+				}
+			],
+			"editor/title": [
+				{
+					"when": "activeEditor == workbench.editors.files.textFileEditor && (resourceLangId == markdown || resourceLangId == mdx)",
+					"command": "markmap-vscode.open",
+					"group": "navigation"
+				}
+			]
+		},
+		"configuration": {
+			"title": "Markmap",
+			"properties": {
+				"markmap.defaultOptions": {
+					"type": "string",
+					"default": "",
+					"markdownDescription": "Default options for Markmap, see <https://markmap.js.org/docs/json-options#markmap-for-vscode> for more details.",
+					"editPresentation": "multilineText"
+				},
+				"markmap.customCSS": {
+					"type": "string",
+					"default": "",
+					"markdownDescription": "Custom CSS for Markmap, please don't change this if you are not sure what you are doing. You can test your styles on <https://markmap.js.org> since the SVGs shares the same structure.",
+					"editPresentation": "multilineText"
+				}
+			}
+		}
+	},
+	"capabilities": {
+		"untrustedWorkspaces": {
+			"supported": true
+		}
+	},
+	"scripts": {
+		"prepare": "husky",
+		"vscode:prepublish": "pnpm build",
+		"clean": "del-cli dist",
+		"build:js": "rollup -c && node dist/postbuild.js",
+		"build": "pnpm lint:fix && pnpm clean && pnpm build:js",
+		"lint": "eslint && prettier --check src",
+		"lint:fix": "eslint --fix && prettier --write src",
+		"dev:browser": "vscode-test-web --extensionDevelopmentPath=. ."
+	},
+	"repository": "https://github.com/gera2ld/markmap-vscode",
+	"main": "dist/extension.js",
+	"browser": "dist/extension.js",
+	"files": [
+		"dist"
+	],
+	"devDependencies": {
+		"@babel/core": "^7.23.5",
+		"@babel/plugin-transform-runtime": "^7.23.4",
+		"@babel/preset-env": "^7.23.5",
+		"@babel/preset-typescript": "^7.23.3",
+		"@babel/runtime": "^7.22.6",
+		"@eslint/js": "^9.20.0",
+		"@rollup/plugin-babel": "^6.0.4",
+		"@rollup/plugin-commonjs": "^25.0.7",
+		"@rollup/plugin-json": "^6.0.1",
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-replace": "^5.0.5",
+		"@rollup/plugin-terser": "^0.4.4",
+		"@types/lodash.debounce": "^4.0.7",
+		"@types/node": "^22.13.2",
+		"@types/vscode": "~1.75.0",
+		"@types/vscode-webview": "^1.57.5",
+		"@vscode/test-web": "*",
+		"del-cli": "^6.0.0",
+		"eslint": "^9.17.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.2.1",
+		"globals": "^15.14.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^15.3.0",
+		"lodash.debounce": "^4.0.8",
+		"markmap-common": "0.18.9",
+		"markmap-lib": "0.18.11",
+		"markmap-render": "0.18.10",
+		"markmap-toolbar": "0.18.10",
+		"markmap-view": "0.18.10",
+		"read-package-up": "^11.0.0",
+		"rollup": "^4.6.1",
+		"rollup-plugin-postcss": "^4.0.2",
+		"typescript": "^5.7.2",
+		"typescript-eslint": "^8.18.2",
+		"vscode-uri": "^3.0.7"
+	},
+	"lint-staged": {
+		"*.ts": [
+			"eslint --fix",
+			"prettier --write"
+		]
+	},
+	"__metadata": {
+		"installedTimestamp": 1740490081007,
+		"size": 3781338
+	}
+}
